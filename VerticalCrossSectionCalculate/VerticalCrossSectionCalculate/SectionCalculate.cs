@@ -282,30 +282,36 @@ namespace VerticalCrossSectionCalculate
             Point j3 = new Point(), j_3 = new Point();
             for (int i = 5; i >= -5; i--)
             {
-                Point p1 = new Point
+                if (i != 0)
                 {
-                    X = cenPt.X + i * 5 * Cos(alpha),
-                    Y = cenPt.Y + i * 5 * Sin(alpha)
-                };
-                p1.H = GetInsPoiHeight(p1, out _);
-                if (i == 3)
-                {
-                    j3 = p1;
+                    Point p1 = new Point
+                    {
+                        X = cenPt.X + i * 5 * Cos(alpha),
+                        Y = cenPt.Y + i * 5 * Sin(alpha)
+                    };
+                    p1.H = GetInsPoiHeight(p1, out _);
+                    insPois.Add(p1);
+                    if (i == 3)
+                    {
+                        j3 = p1;
+                    }
+                    else if (i == -3)
+                    {
+                        j_3 = p1;
+                    }
                 }
-                else if (i == -3)
+                else
                 {
-                    j_3 = p1;
+                    insPois.Add(cenPt);
                 }
-                insPois.Add(p1);
             }
-
             correct = new double[]
             {
                 alpha,j3.X,j3.Y,j3.H,j_3.X,j_3.Y,j_3.H
             };
             return insPois;
         }
-        private List<Point> GetVertcInsertPoints(Point cenPt, double alpha)
+        private List<Point> GetVertcInsertPoints(Point cenPt, double azimuth)
         {
             List<Point> insPois = new List<Point>();
             for (int i = 5; i >= -5; i--)
@@ -314,8 +320,8 @@ namespace VerticalCrossSectionCalculate
                 {
                     Point p1 = new Point
                     {
-                        X = cenPt.X + i * 5 * Cos(alpha),
-                        Y = cenPt.Y + i * 5 * Sin(alpha)
+                        X = cenPt.X + i * 5 * Cos(azimuth),
+                        Y = cenPt.Y + i * 5 * Sin(azimuth)
                     };
                     p1.H = GetInsPoiHeight(p1, out _);
                     insPois.Add(p1);
