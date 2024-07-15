@@ -74,10 +74,7 @@ namespace VerticalCrossSectionCalculate
             // 4.1
             double alpha01 = GetAzimuth(Pts["K0"], Pts["K1"]).Rad + PI / 2;
             double alpha12 = GetAzimuth(Pts["K1"], Pts["K2"]).Rad + PI / 2;
-            var ver1AllArea = from p in croInsPts.Take(14)
-                              select GetVertcInsertPoints(p, alpha01)
-                              into insPts
-                              select new { Area = GetAllSectionArea(insPts), Center = insPts[5] };
+            var ver1AllArea = from p in croInsPts.Take(14) select GetVertcInsertPoints(p, alpha01) into insPts select new { Area = GetAllSectionArea(insPts), Center = insPts[5] };
             var ver2AllArea = from p in croInsPts.Skip(13) select GetVertcInsertPoints(p, alpha12) into insPts select new { Area = GetAllSectionArea(insPts), Center = insPts[5] };
             // 4.2
             List<double> ver1Vols = GetVolumes(ver1AllArea);
@@ -184,6 +181,7 @@ namespace VerticalCrossSectionCalculate
         }
 
         // 计算内插点高程
+        // out的是题目要求输出的东西
         private double GetInsPoiHeight(Point ins, out IEnumerable<dynamic> poisNearby)
         {
             poisNearby = Pts.Select(p => new { p.Value.H, Distance = ins.GetDistance(p.Value), Name = p.Key }).Where(p => p.Distance != 0).OrderBy(p => p.Distance).Take(5);
@@ -273,7 +271,9 @@ namespace VerticalCrossSectionCalculate
             return p;
         }
 
-        // 计算横断面上的内插点序列
+        // 计算横断面上的内插点序列。
+        // 第一个重载是提供两个点，计算中点的横断面，out的是题目要求输出的中间变量；
+        // 第二个重载是提供一个点和一个方向，计算这个点的在这个方向上的断面。
         private List<Point> GetVertcInsertPoints(Point K0, Point K1, out double[] correct)
         {
             Point cenPt = GetCenterPoint(K0, K1);
@@ -335,6 +335,7 @@ namespace VerticalCrossSectionCalculate
         }
 
         // 路基土石方量计算
+        // 这里的dynamic是存储横断面信息的一个匿名类，里面有横断面面积Area和横断面中点Center
         private List<double> GetVolumes(IEnumerable<dynamic> verAllArea)
         {
             List<double> vols = new List<double>();
