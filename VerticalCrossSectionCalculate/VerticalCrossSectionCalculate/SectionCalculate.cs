@@ -227,36 +227,30 @@ namespace VerticalCrossSectionCalculate
         // 计算纵断面上的内插点序列
         private List<Point> GetCrossInsertPoints()
         {
-            List<Point> insPts = new List<Point>() { Pts["K0"] };
-            double alpha01 = GetAzimuth(Pts["K0"], Pts["K1"]).Rad;
             int num = 1;
-            for (double L = 10; L < Pts["K0"].GetDistance(Pts["K1"]); L += 10)
-            {
-                Point insP = new Point()
-                {
-                    Name = "N" + num++,
-                    X = Pts["K0"].X + L * Cos(alpha01),
-                    Y = Pts["K0"].Y + L * Sin(alpha01)
-                };
-                insP.H = GetInsPoiHeight(insP, out _);
-                insPts.Add(insP);
-            }
-            insPts.Add(Pts["K1"]);
-
-            double alpha12 = GetAzimuth(Pts["K1"], Pts["K2"]).Rad;
-            for (double L = 10; L < Pts["K1"].GetDistance(Pts["K2"]); L += 10)
-            {
-                Point insP = new Point()
-                {
-                    Name = "N" + num++,
-                    X = Pts["K1"].X + L * Cos(alpha12),
-                    Y = Pts["K1"].Y + L * Sin(alpha12)
-                };
-                insP.H = GetInsPoiHeight(insP, out _);
-                insPts.Add(insP);
-            }
-            insPts.Add(Pts["K2"]);
-            return insPts;
+            Func<Point, Point, List<Point>> getTwoPoiCrossInsPois = (K0, K1) =>
+              {
+                  List<Point> insPois = new List<Point> { K0 };
+                  double alpha = GetAzimuth(K0, K1).Rad;
+                  double Lmax = K0.GetDistance(K1);
+                  for (double L = 10; L < Lmax; L += 10)
+                  {
+                      Point insP = new Point()
+                      {
+                          Name = "N" + num++,
+                          X = K0.X + L * Cos(alpha),
+                          Y = K0.Y + L * Sin(alpha)
+                      };
+                      insP.H = GetInsPoiHeight(insP, out _);
+                      insPois.Add(insP);
+                  }
+                  return insPois;
+              };
+            var allPois = new List<Point>();
+            allPois.AddRange(getTwoPoiCrossInsPois(Pts["K0"], Pts["K1"]));
+            allPois.AddRange(getTwoPoiCrossInsPois(Pts["K1"], Pts["K2"]));
+            allPois.Add(Pts["K2"]);
+            return allPois;
         }
 
         // 计算横断面中心点
